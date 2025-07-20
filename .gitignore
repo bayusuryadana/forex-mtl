@@ -1,0 +1,12 @@
+.bsp
+.idea
+out/
+
+target/
+project/target
+project/project
+
+*.log
+
+.DS_Store
+Thumbs.db

@@ -1,0 +1,6 @@
+services:
+  one-frame:
+    image: paidyinc/one-frame:latest
+    container_name: one-frame
+    ports:
+      - "8080:8080"
