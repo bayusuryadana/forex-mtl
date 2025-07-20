@@ -14,5 +14,11 @@ case class HttpConfig(
 )
 
 case class OneFrameConfig(
-    apiToken: String
+    apiToken: String,
+    cache: OneFrameCacheConfig
+)
+
+case class OneFrameCacheConfig(
+    maxSize: Int,
+    ttlSeconds: Int
 )

@@ -11,7 +11,6 @@ import org.http4s.circe.CirceEntityDecoder.circeEntityDecoder
 import org.http4s.client.Client
 import org.http4s.{ Header, Headers, Method, Request }
 import org.http4s.implicits._
-import org.typelevel.ci._
 
 class Service[F[_]: Async](
     httpClient: Client[F],
@@ -31,7 +30,7 @@ class Service[F[_]: Async](
         val request = Request[F](
           method = Method.GET,
           uri = uri,
-          headers = Headers(Header.Raw(ci"token", apiToken))
+          headers = Headers(Header("token", apiToken))
         )
 
         httpClient.expect[List[OneFrameResponse]](request).attempt.flatMap {

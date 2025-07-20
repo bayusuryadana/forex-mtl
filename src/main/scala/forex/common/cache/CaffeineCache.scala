@@ -4,7 +4,7 @@ import cats.effect.Sync
 import com.github.benmanes.caffeine.cache.{ Cache, Caffeine }
 import java.util.concurrent.TimeUnit
 
-class CaffeineCache[F[_]: Sync, K, V](maxSize: Long, ttlSeconds: Long, cache: Cache[K, V]) extends Algebra[F, K, V] {
+class CaffeineCache[F[_]: Sync, K, V](cache: Cache[K, V]) extends Algebra[F, K, V] {
 
   override def get(key: K): F[Option[V]] =
     Sync[F].delay(Option(cache.getIfPresent(key)))
@@ -22,6 +22,6 @@ object CaffeineCache {
       .expireAfterWrite(ttlSeconds, TimeUnit.SECONDS)
       .build[K, V]()
 
-    new CaffeineCache[F, K, V](maxSize, ttlSeconds, cache)
+    new CaffeineCache[F, K, V](cache)
   }
 }
