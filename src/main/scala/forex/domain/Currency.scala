@@ -16,6 +16,8 @@ object Currency {
   case object SGD extends Currency
   case object USD extends Currency
 
+  val all: List[Currency] = List(AUD, CAD, CHF, EUR, GBP, NZD, JPY, SGD, USD)
+
   implicit val show: Show[Currency] = Show.show {
     case AUD => "AUD"
     case CAD => "CAD"
@@ -38,7 +40,7 @@ object Currency {
     case "JPY" => JPY
     case "SGD" => SGD
     case "USD" => USD
-    case _ => throw CurrencyNotSupportedException(s"$s is not supported")
+    case _     => throw CurrencyNotSupportedException(s"$s is not supported")
   }
 
 }

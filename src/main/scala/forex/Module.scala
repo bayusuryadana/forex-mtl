@@ -1,7 +1,7 @@
 package forex
 
 import cats.data.Kleisli
-import cats.effect.{Concurrent, Sync, Timer}
+import cats.effect.{ Concurrent, Sync, Timer }
 import cats.implicits.catsSyntaxApplicativeError
 import forex.common.cache.CaffeineCache
 import forex.common.error.Error.CurrencyNotSupportedException
@@ -13,21 +13,22 @@ import forex.programs._
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.implicits._
-import org.http4s.server.middleware.{AutoSlash, Timeout}
+import org.http4s.server.middleware.{ AutoSlash, Timeout }
 
 class Module[F[_]: Concurrent: Timer](config: ApplicationConfig, httpClient: Client[F]) {
 
   val cache: CaffeineCache[F, Rate.Pair, Rate] =
     CaffeineCache[F, Rate.Pair, Rate](maxSize = 1000, ttlSeconds = 60)
 
-  private val ratesService: RatesService[F] = RatesServices[F](httpClient, cache, config.oneFrame.apiToken)
+  private val ratesService: RatesService[F] =
+    RatesServices[F](httpClient, cache, config.oneFrame.host, config.oneFrame.apiToken)
 
   private val ratesProgram: RatesProgram[F] = RatesProgram[F](ratesService)
 
   private val ratesHttpRoutes: HttpRoutes[F] = new RatesHttpRoutes[F](ratesProgram).routes
 
-  type PartialMiddleware = HttpRoutes[F] => HttpRoutes[F]
-  type TotalMiddleware   = HttpApp[F] => HttpApp[F]
+  private type PartialMiddleware = HttpRoutes[F] => HttpRoutes[F]
+  private type TotalMiddleware   = HttpApp[F] => HttpApp[F]
 
   private val routesMiddleware: PartialMiddleware = {
     { http: HttpRoutes[F] =>
