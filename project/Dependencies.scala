@@ -6,11 +6,10 @@ object Dependencies {
     val cats       = "2.6.1"
     val catsEffect = "2.5.1"
     val fs2        = "2.5.4"
-    val http4s     = "0.21.33"
+    val http4s     = "0.22.15"
     val circe      = "0.14.2"
     val pureConfig = "0.17.4"
     val caffeine   = "3.2.2"
-    val ci         = "1.1.2"
 
     val kindProjector  = "0.13.2"
     val logback        = "1.2.3"
@@ -28,7 +27,6 @@ object Dependencies {
     lazy val fs2        = "co.fs2"                        %% "fs2-core"    % Versions.fs2
     lazy val pureConfig = "com.github.pureconfig"         %% "pureconfig"  % Versions.pureConfig
     lazy val caffeine   = "com.github.ben-manes.caffeine" % "caffeine"     % Versions.caffeine
-    lazy val ci         = "org.typelevel"                 %% "ci"          % Versions.ci
 
     lazy val http4sDsl       = http4s("http4s-dsl")
     lazy val http4sServer    = http4s("http4s-blaze-server")

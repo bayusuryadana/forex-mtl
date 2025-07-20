@@ -3,14 +3,15 @@ package forex.services.oneframe
 import cats.effect.Async
 import cats.syntax.all._
 import forex.common.cache.CaffeineCache
-import forex.domain.{ Price, Rate, Timestamp }
+import forex.domain.{Price, Rate, Timestamp}
 import forex.services.oneframe.Protocol._
 import forex.services.oneframe.errors.Error.OneFrameLookupFailed
 import forex.services.oneframe.errors._
 import org.http4s.circe.CirceEntityDecoder.circeEntityDecoder
 import org.http4s.client.Client
-import org.http4s.{ Header, Headers, Method, Request }
+import org.http4s.{Header, Headers, Method, Request}
 import org.http4s.implicits._
+import org.typelevel.ci.CIString
 
 class Service[F[_]: Async](
     httpClient: Client[F],
@@ -30,7 +31,7 @@ class Service[F[_]: Async](
         val request = Request[F](
           method = Method.GET,
           uri = uri,
-          headers = Headers(Header("token", apiToken))
+          headers = Headers(Header.Raw.apply(CIString("token"), apiToken))
         )
 
         httpClient.expect[List[OneFrameResponse]](request).attempt.flatMap {
@@ -45,7 +46,7 @@ class Service[F[_]: Async](
             }
 
           case Left(e) =>
-            Async[F].pure(Left(OneFrameLookupFailed(e.getMessage)))
+            Async[F].pure(Left(OneFrameLookupFailed(s"Something is wrong: ${e.getMessage}")))
         }
     }
 

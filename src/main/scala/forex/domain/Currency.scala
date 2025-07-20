@@ -1,6 +1,7 @@
 package forex.domain
 
 import cats.Show
+import forex.common.error.Error.CurrencyNotSupportedException
 
 sealed trait Currency
 
@@ -37,6 +38,7 @@ object Currency {
     case "JPY" => JPY
     case "SGD" => SGD
     case "USD" => USD
+    case _ => throw CurrencyNotSupportedException(s"$s is not supported")
   }
 
 }

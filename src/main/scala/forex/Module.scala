@@ -1,7 +1,10 @@
 package forex
 
-import cats.effect.{ Concurrent, Timer }
+import cats.data.Kleisli
+import cats.effect.{Concurrent, Sync, Timer}
+import cats.implicits.catsSyntaxApplicativeError
 import forex.common.cache.CaffeineCache
+import forex.common.error.Error.CurrencyNotSupportedException
 import forex.config.ApplicationConfig
 import forex.domain.Rate
 import forex.http.rates.RatesHttpRoutes
@@ -10,7 +13,7 @@ import forex.programs._
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.implicits._
-import org.http4s.server.middleware.{ AutoSlash, Timeout }
+import org.http4s.server.middleware.{AutoSlash, Timeout}
 
 class Module[F[_]: Concurrent: Timer](config: ApplicationConfig, httpClient: Client[F]) {
 
@@ -32,9 +35,26 @@ class Module[F[_]: Concurrent: Timer](config: ApplicationConfig, httpClient: Cli
     }
   }
 
-  private val appMiddleware: TotalMiddleware = { http: HttpApp[F] =>
+  private def decodeFailureHandler[Func[_]: Sync]: HttpApp[Func] => HttpApp[Func] = { httpApp =>
+    Kleisli { req =>
+      httpApp.run(req).handleErrorWith {
+        case cns: CurrencyNotSupportedException =>
+          Sync[Func].delay {
+            Response[Func](Status.BadRequest)
+              .withEntity(s"Invalid request: ${cns.msg}")
+          }
+        case other =>
+          Sync[Func].raiseError(other)
+      }
+    }
+  }
+
+  private val timeoutMiddleware: TotalMiddleware = { http =>
     Timeout(config.http.timeout)(http)
   }
+
+  private val appMiddleware: TotalMiddleware =
+    decodeFailureHandler andThen timeoutMiddleware
 
   private val http: HttpRoutes[F] = ratesHttpRoutes
 
