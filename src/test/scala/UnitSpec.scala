@@ -13,7 +13,7 @@ import org.scalatest.matchers.should.Matchers
 import java.time.OffsetDateTime
 import scala.concurrent.ExecutionContext
 
-class ServiceSpec extends AnyFunSuite with Matchers {
+class UnitSpec extends AnyFunSuite with Matchers {
 
   implicit val cs: ContextShift[IO] = IO.contextShift(ExecutionContext.global)
   implicit val timer: Timer[IO]     = IO.timer(ExecutionContext.global)
