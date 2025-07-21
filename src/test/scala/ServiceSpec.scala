@@ -96,6 +96,24 @@ class ServiceSpec extends AnyFunSuite with Matchers {
     io.unsafeRunSync()
   }
 
+  test("get returns error when JSON decoding fails") {
+    val pairToTest = pair(USD, EUR)
+
+    val brokenJson = """{ "not": "valid", """
+
+    val cache = new MockCache()
+    val httpClient = new MockHttpClient(Right(brokenJson))
+
+    val service = new Service[IO](httpClient, cache, testHost, testToken)
+
+    val io = service.get(pairToTest).map {
+      case Left(_: OneFrameLookupFailed) => succeed
+      case other                         => fail(s"Expected OneFrameLookupFailed due to decode error, got $other")
+    }
+
+    io.unsafeRunSync()
+  }
+
   test("get returns error when HTTP returns pair not found") {
     val pairToTest = pair(USD, EUR)
     val now = OffsetDateTime.parse("2023-01-01T00:00:00Z")
