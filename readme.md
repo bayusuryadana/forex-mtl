@@ -1,6 +1,5 @@
 # Forex Rate Service – Notes
 
-This service implements the logic described in the [Paidy Forex task](https://github.com/paidy/interview/blob/master/Forex.md).  
 Below are the key assumptions, simplifications, and design decisions made during implementation.
 ---
 
