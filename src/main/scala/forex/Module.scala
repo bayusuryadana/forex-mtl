@@ -1,10 +1,12 @@
 package forex
 
 import cats.data.Kleisli
-import cats.effect.{ Concurrent, Sync, Timer }
+import cats.effect.{Concurrent, Sync, Timer}
 import cats.implicits.catsSyntaxApplicativeError
+import forex.common._
 import forex.common.cache.CaffeineCache
 import forex.common.error.Error.CurrencyNotSupportedException
+import forex.common.httpclient.Http4sClient
 import forex.config.ApplicationConfig
 import forex.domain.Rate
 import forex.http.rates.RatesHttpRoutes
@@ -13,9 +15,11 @@ import forex.programs._
 import org.http4s._
 import org.http4s.client.Client
 import org.http4s.implicits._
-import org.http4s.server.middleware.{ AutoSlash, Timeout }
+import org.http4s.server.middleware.{AutoSlash, Timeout}
 
-class Module[F[_]: Concurrent: Timer](config: ApplicationConfig, httpClient: Client[F]) {
+class Module[F[_]: Concurrent: Timer](config: ApplicationConfig, http4sClient: Client[F]) {
+
+  val httpClient: HttpClient[F] = Http4sClient(http4sClient)
 
   val cache: CaffeineCache[F, Rate.Pair, Rate] =
     CaffeineCache[F, Rate.Pair, Rate](maxSize = 1000, ttlSeconds = 60)

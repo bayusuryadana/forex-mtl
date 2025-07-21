@@ -1,9 +1,5 @@
 package forex.config
 
-import org.http4s.Uri
-import pureconfig.ConfigReader
-import pureconfig.error.CannotConvert
-
 import scala.concurrent.duration.FiniteDuration
 
 case class ApplicationConfig(
@@ -19,7 +15,7 @@ case class HttpConfig(
 
 case class OneFrameConfig(
     apiToken: String,
-    host: Uri,
+    host: String,
     cache: OneFrameCacheConfig
 )
 
@@ -27,10 +23,3 @@ case class OneFrameCacheConfig(
     maxSize: Int,
     ttlSeconds: Int
 )
-
-object ApplicationConfig {
-  implicit val uriConfigReader: ConfigReader[Uri] =
-    ConfigReader[String].emap { str =>
-      Uri.fromString(str).left.map(err => CannotConvert(str, "Uri", err.message))
-    }
-}
